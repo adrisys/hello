@@ -16,5 +16,5 @@ workflow {
 }
 
 workflow.onComplete {
-    println("The secret is: ${secrets.testsffecret}")
+    println("The secret is: ${secrets.testsecret}")
 }
