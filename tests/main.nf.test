@@ -1,0 +1,57 @@
+nextflow_process {
+    name "Test sayHello process"
+    script "./main.nf"
+    process "sayHello"
+
+    test("Should say hello to the world") {
+        when {
+            process {
+                """
+                input[0] = "Hello"
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert process.stdout.trim() == "Hello world!"
+        }
+    }
+
+    test("Should handle multiple different greetings") {
+        when {
+            process {
+                """
+                input[0] = "Bonjour"
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert process.stdout.trim() == "Bonjour world!"
+        }
+    }
+}
+
+nextflow_pipeline {
+    name "Test main workflow"
+    script "./main.nf"
+
+    test("Should process all greetings") {
+        when {
+            params {
+                outdir = "output"
+            }
+        }
+
+        then {
+            assert workflow.success
+            assert workflow.trace.succeeded().size() == 4
+            assert workflow.stdout.contains("Bonjour world!")
+            assert workflow.stdout.contains("Ciao world!")
+            assert workflow.stdout.contains("Hello world!")
+            assert workflow.stdout.contains("Hola world!")
+        }
+    }
+}
